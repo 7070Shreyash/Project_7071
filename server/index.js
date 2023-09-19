@@ -9,6 +9,11 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import { verifyToken } from "./middleware/auth";
+import loginRoutes from "./routes/login.js";
+import quesRoutes from "./routes/ques.js";
+import userRoutes from "./routes/user.js";
+import { register } from "./controllers/login.js";
+import { createQues } from "./controllers/ques.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,7 +45,6 @@ const storage = multer.diskStorage({
   app.post("/home/create",verifyToken,upload.single("picture"),createQues);
 
   app.use("/login",loginRoutes);
-  app.use("/home",homeRoutes);
   app.use("/users",userRoutes);
   app.use("/ques",quesRoutes);
 

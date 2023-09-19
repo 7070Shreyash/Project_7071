@@ -19,9 +19,13 @@ const quesSchema = new mongoose.Schema(
             type : String,
             required : true,
         },
+        picturePath : {
+            type : String,
+            default : "",
+        },
         answers : [
             {
-                user: {
+                userId: {
                     type : mongoose.Schema.Types.ObjectId,
                     ref : 'User',   
                 },

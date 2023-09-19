@@ -1,11 +1,10 @@
 import Ques from "../models/Ques";
 import User from "../models/User";
 
-
 export const createQues = async(req,res) => {
     try{
 
-        const { userId , statement } = req.body;
+        const { userId , statement , picturePath } = req.body;
         const user = await User.findById(userId);
         const newQues = new Ques({
             userId,
@@ -13,6 +12,7 @@ export const createQues = async(req,res) => {
             lastName : user.lastName,
             location : user.location,
             statement,
+            picturePath,
             answers : [],
         });
         await newQues.save();
@@ -35,8 +35,8 @@ export const getFeedQues = async(req,res) => {
 
 export const upvoteQues = async(req,res) => {
     try{
-        const {quesId , ansId} = req.params;
-        const { userId } = req.body;
+        const {quesId} = req.params;
+        const { userId , ansId} = req.body;
         const ques = Ques.findById(quesId);
         const answer = ques.answers.find((value) => value._id === ansId);
         if(!answer) {
@@ -48,7 +48,11 @@ export const upvoteQues = async(req,res) => {
         } else {
             answer.upvotes.set(userId,true);
         }
-        const updatedQues = await ques.save();
+        const updatedQues = await Ques.findByIdAndUpdate(
+            quesId,
+            {answers : ques.answers},
+            {new : true},
+        )
         res.status(200).json(updatedQues);
         
     } catch(err) {
@@ -65,8 +69,8 @@ export const ansQues = async(req,res) => {
         const user = await User.findById(userId);
         
         const tempAnswer= {
+            userId,
             answer : solution,
-            user : userId,
             upvotes : {},
         };
 
@@ -77,11 +81,10 @@ export const ansQues = async(req,res) => {
         } else if(user.contributions > 1000 && user.status === "beta") {
             user.status = "pro";
         }
-
         await User.findByIdAndUpdate(
             userId,
             {contributions : user.contributions,
-                status : user.status,
+              status : user.status,
             },
             {new : true},
         )
